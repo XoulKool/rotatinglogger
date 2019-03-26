@@ -1,0 +1,21 @@
+#Logger Config file.  Each --- represents a new instance of Log to be created
+---
+name: "logger1"
+interval: 5 # minutes
+host: "ftp.myserver.com"
+port: 21
+username: "foo"
+password: "bar"
+logFileDirectory: "/home/fred/logs"
+logFileName: "logger1.log"
+level: "INFO"
+---
+name: "logger2"
+interval: 3
+host: "ftp.anotherserver.com"
+port: 42
+username: "foo"
+password: "bar"
+logFileDirectory: "/home/fred/logs"
+logFileName: "logger2.log"
+level: "INFO"
