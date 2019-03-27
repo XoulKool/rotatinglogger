@@ -1,20 +1,31 @@
 package logger;
 
+import ftp.FtpClientLogger;
+
+/**
+ * This class carries out most of the logging facilities for an individual logger.  The snakeyaml parser is also able to utilize this class
+ * and store all variables in the YAML into the variables in this class. (The getters and setters for all variables
+ * are necessary for snakeyaml to do this, as they help instantiate the java bean)
+ */
 public class Log {
 
     String name;
+    String host;
+    int port;
     String username;
     String password;
     String logFileDirectory;
     String logFileName;
     String level;
     int interval;
-    String host;
-    int port;
 
-
+    /**
+     * This method will fire up the connection to the ftp server, and will consequently start the wait for an upload
+     * to the server.
+     */
     public void fireLog(){
-
+        System.out.println(this.username);
+        FtpClientLogger ftpClientLogger = new FtpClientLogger(this.host, this.port, this.username, this.password, this.logFileDirectory, this.logFileName);
     }
 
     public String getName() {

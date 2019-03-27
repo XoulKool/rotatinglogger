@@ -1,13 +1,16 @@
-package runner;
+package runningApp;
 
+import logger.Log;
 import logger.Logger;
 
-import java.io.FileNotFoundException;
-
-public class main{
+public class RunningApplication {
     public static void main(String args[]){
         Logger logger = new Logger();
         logger.init("config.yaml");
+        /*FtpClientLogger ftpLogger = new FtpClientLogger("localhost", 30, "low3llg3org3",
+                "Pikmin123","C:\\Users\\M4600_SSD\\IdeaProjects\\rotatinglogger\\src\\test\\local_logs\\","logger1.log");*/
+        Log logger1 = logger.getLogger("logger1");
+        System.out.println(logger1.getUsername());
 
 //        Logger logger = Logger.getLogger("logger1");
 //        logger.info("test message");

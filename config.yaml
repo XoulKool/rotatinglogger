@@ -2,20 +2,20 @@
 ---
 name: "logger1"
 interval: 5 # minutes
-host: "ftp.myserver.com"
-port: 21
-username: "foo"
-password: "bar"
-logFileDirectory: "/home/fred/logs"
+host: "localhost"
+port: 22
+username: "low3llg3org3"
+password: "Pikmin123"
+logFileDirectory: "C:\\Users\\M4600_SSD\\IdeaProjects\\rotatinglogger\\src\\test\\local_logs\\"
 logFileName: "logger1.log"
 level: "INFO"
 ---
 name: "logger2"
 interval: 3
-host: "ftp.anotherserver.com"
-port: 42
-username: "foo"
-password: "bar"
-logFileDirectory: "/home/fred/logs"
+host: "localhost"
+port: 23
+username: "goldengod"
+password: "falconpunch"
+logFileDirectory: "C:\\Users\\M4600_SSD\\IdeaProjects\\rotatinglogger\\src\\test\\local_logs\\"
 logFileName: "logger2.log"
 level: "INFO"
