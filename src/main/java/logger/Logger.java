@@ -35,11 +35,12 @@ public class Logger {
             numberOfLoggers++;
             loggersList.add((Log) loggersIterable.iterator().next());
         }
-        //This for loop will fire up all of the ftp clients for each of the loggers
+        //This for loop will fire up all of the ftp clients for each of the loggers, as well as save the loggers in
+        //an easily traversable Map
         for(int i = 0; i < numberOfLoggers; i++){
             Log newLog = loggersList.get(i);
             loggerMap.put(newLog.name, newLog);
-            loggersList.get(i).fireLog();
+            //loggersList.get(i).fireUpLog();
         }
     }
 
