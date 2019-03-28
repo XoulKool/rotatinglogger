@@ -55,9 +55,7 @@ public class FtpClientLogger extends Thread {
         this.newLogPath = "";
 
         try {
-            System.out.println("Connecting...");
             ftpClient.connect(host, port);
-            System.out.println("Done connecting!");
             ftpClient.login(username, password);
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
@@ -76,34 +74,15 @@ public class FtpClientLogger extends Thread {
             try {
                 System.out.println("Go to Sleep...");
                 this.sleep((long) sleepInterval);
-
-                localLog = new File(fileDirectory + fileName);
-
-                if (localLog.length() == 0)//If file is empty, go back to sleep and do not upload
-                    continue;
-
-                newLogFileName = newFileName();
-                String newLogPath = fileDirectory + newLogFileName;
-                File rotatedFile = new File(newLogPath);
-                if(localLog.renameTo(rotatedFile)){
-                    System.out.println("File was successfully renamed");
-                }
-                InputStream inputStream = new FileInputStream(rotatedFile);
-                System.out.println("[Uploading Log]:     " + newLogFileName);
-                boolean done = ftpClient.storeFile(newLogFileName, inputStream);//variable to see if file was successfully transferred
-                inputStream.close();
-                if (done) {
-                    System.out.println(newLogFileName + " was uploaded successfully");
-                    localLog.delete();//Delete old log
-                    rotatedFile.delete();//Deleted newly created rotated log
-                } else {
-                    System.out.println(ftpClient.getReplyCode());
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException ex) {
+                uploadLog();
+            }
+            catch(IOException e){
+                e.printStackTrace();
+            }
+            catch (InterruptedException ex) {
                 System.out.println("Shutting down thread");
             }
+
         }
     }
     /**
@@ -113,6 +92,36 @@ public class FtpClientLogger extends Thread {
         int indexOfLogExtension = fileName.indexOf(".log");
         String fileWithDate = fileName.substring(0, indexOfLogExtension) + dateFormatter.format(new Date()) + fileName.substring(indexOfLogExtension);
         return fileWithDate;
+    }
+
+    /**
+     * Method which uploads log with new updated date/time filename to ftp server.
+     * If log is empty, do not attempt upload
+     * @throws IOException
+     */
+    public void uploadLog() throws IOException{
+        localLog = new File(fileDirectory + fileName);
+
+        if (localLog.length() == 0)//If file is empty, go back to sleep and do not upload
+            return;
+
+        newLogFileName = newFileName();
+        String newLogPath = fileDirectory + newLogFileName;
+        File rotatedFile = new File(newLogPath);
+        if(localLog.renameTo(rotatedFile)){
+            System.out.println("File was successfully renamed");
+        }
+        InputStream inputStream = new FileInputStream(rotatedFile);
+        System.out.println("[Uploading Log]:     " + newLogFileName);
+        boolean done = ftpClient.storeFile(newLogFileName, inputStream);//variable to see if file was successfully transferred
+        inputStream.close();
+        if (done) {
+            System.out.println(newLogFileName + " was uploaded successfully");
+            localLog.delete();//Delete old log
+            rotatedFile.delete();//Deleted newly created rotated log
+        } else {
+            System.out.println(ftpClient.getReplyCode());
+        }
     }
 }
 
