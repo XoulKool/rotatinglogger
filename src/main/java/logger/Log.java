@@ -24,6 +24,9 @@ public class Log {
                           //will use this Bufffered Writer to conserve memory
 
     final boolean APPEND = true;//variable to be used in file writer.
+    final String ERROR = "ERROR";
+    final String INFO = "INFO";
+    final String DEBUG = "DEBUG";
 
     /**
      * This method will fire up the connection to the ftp server, and will consequently start the wait for an upload
@@ -51,9 +54,43 @@ public class Log {
             System.out.println("There was an IO error logging to");
             e.printStackTrace();
         }
-
     }
 
+    /**
+     * Provide logging facility to write info logs.  Only Log classes with level INFO or DEBUG can write these logs.
+     * @param infoLog
+     */
+    public void info(String infoLog){
+        if(!level.equals(ERROR)){//If the level is anything but error, then allow this log to write to file
+            writeLog(INFO, infoLog);
+        }
+        else{
+            System.out.println(name + " has insufficient log level to write " + INFO + " logs.");
+        }
+    }
+
+    /**
+     * Provide logging facility to write error logs.  All levels are able to write these types of logs.
+     * @param errorLog
+     */
+    public void error(String errorLog){
+        writeLog(ERROR, errorLog);
+    }
+
+    /**
+     * Provide logging facility to write debug logs.  Only Log classes with level DEBUG can write these logs.
+     * @param debugLog
+     */
+    public void debug(String debugLog){
+        if(level.equals(DEBUG)){//Only the debug level has the ability to write debug logs
+            writeLog(DEBUG, debugLog);
+        }
+        else{
+            System.out.println(name + " has insufficient log level to write " + DEBUG + " logs.");
+        }
+    }
+
+//Mindless getters and setters.  These are required for snakeyaml to load all the config data into the Log class
 
     public String getName() {
         return name;
