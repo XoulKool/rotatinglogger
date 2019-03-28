@@ -30,11 +30,11 @@ public class FtpClientLogger extends Thread {
 
     /**
      * Once initialized, the Logger class  will call on the run method of this thread class to begin waiting for a
-     * chance to upload the current log file to server specified in config via FTP.
+     * chance to upload the current log file to server specified in config via FTP (service provided by apache commons-net).
      * If the log file is empty, the thread will fall back asleep and wait for
      * the next chance.  If it is not empty, the thread will get the current date/time and update the name of the log
      * with this timestamp. Upload will then commence.
-     *
+     * <p>
      * The log class will provide the following parameters to fire up the FTP Client:
      *
      * @param host
@@ -75,52 +75,57 @@ public class FtpClientLogger extends Thread {
                 System.out.println("Go to Sleep...");
                 this.sleep((long) sleepInterval);
                 uploadLog();
-            }
-            catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
-            }
-            catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 System.out.println("Shutting down thread");
             }
 
         }
     }
+
     /**
-     * Logic to provide facility to change old filename to the same file but with date/time appended to the name.
+     * Facility to change old filename to the same file but with date/time appended to the name.
      */
-    public String newFileName(){
-        int indexOfLogExtension = fileName.indexOf(".log");
-        String fileWithDate = fileName.substring(0, indexOfLogExtension) + dateFormatter.format(new Date()) + fileName.substring(indexOfLogExtension);
+    public String timeStampFile(String fileName, Date date) {
+        int indexOfLogExtension = fileName.lastIndexOf(".");
+        String fileWithDate = fileName.substring(0, indexOfLogExtension) + dateFormatter.format(date) + fileName.substring(indexOfLogExtension);
         return fileWithDate;
     }
 
     /**
      * Method which uploads log with new updated date/time filename to ftp server.
-     * If log is empty, do not attempt upload
+     * If log is empty, do not attempt upload, return 0.
+     * If there is an error in uploading log, return -1.
+     * If the log is uploaded successfully, return 1.
+     *
      * @throws IOException
      */
-    public void uploadLog() throws IOException{
+    public int uploadLog() throws IOException {
         localLog = new File(fileDirectory + fileName);
 
         if (localLog.length() == 0)//If file is empty, go back to sleep and do not upload
-            return;
+            return 0;
 
-        newLogFileName = newFileName();
+        Date date = new Date();
+        newLogFileName = timeStampFile(fileName, date);
         String newLogPath = fileDirectory + newLogFileName;
         File rotatedFile = new File(newLogPath);
-        if(localLog.renameTo(rotatedFile)){
-            System.out.println("File was successfully renamed");
-        }
+        localLog.renameTo(rotatedFile);
         InputStream inputStream = new FileInputStream(rotatedFile);
         System.out.println("[Uploading Log]:     " + newLogFileName);
         boolean done = ftpClient.storeFile(newLogFileName, inputStream);//variable to see if file was successfully transferred
         inputStream.close();
         if (done) {
             System.out.println(newLogFileName + " was uploaded successfully");
-            localLog.delete();//Delete old log
-            rotatedFile.delete();//Deleted newly created rotated log
+            if(rotatedFile.delete()){
+                System.out.println("Rotated file has been deleted!");
+            };//Deleted newly created rotated log
+            return 1;
         } else {
+            System.out.println("There was an error uploading log " + newLogFileName);
             System.out.println(ftpClient.getReplyCode());
+            return -1;
         }
     }
 }

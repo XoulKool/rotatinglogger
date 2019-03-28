@@ -8,7 +8,7 @@ username: "low3llg3org3"
 password: "Pikmin123"
 logFileDirectory: "C:\\Users\\M4600_SSD\\IdeaProjects\\rotatinglogger\\src\\test\\local_logs\\"
 logFileName: "logger1.log"
-level: "ERROR"
+level: "DEBUG"
 ---
 name: "logger2"
 interval: 3
