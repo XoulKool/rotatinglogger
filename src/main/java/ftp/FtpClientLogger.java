@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * This class is used by Log class to generate its own usable instance of Apache's FTP client
@@ -18,6 +20,11 @@ public class FtpClientLogger extends Thread {
     String fileDirectory;
     String fileName;
     float sleepInterval;
+    SimpleDateFormat dateFormatter;
+    String newLogPath;
+    String newLogFileName;
+    File localLog;
+    File rotatingLog;
 
     final int MINUTE_MULTIPLIER = 60000;
 
@@ -43,8 +50,9 @@ public class FtpClientLogger extends Thread {
         ftpClient = new FTPClient();
         this.fileDirectory = fileDirectory;
         this.fileName = fileName;
-        sleepInterval = intervalInMinutes * MINUTE_MULTIPLIER;
-
+        this.sleepInterval = intervalInMinutes * MINUTE_MULTIPLIER;
+        this.dateFormatter = new SimpleDateFormat("_yyyyMMdd_HHmmss");
+        this.newLogPath = "";
 
         try {
             System.out.println("Connecting...");
@@ -69,18 +77,25 @@ public class FtpClientLogger extends Thread {
                 System.out.println("Go to Sleep...");
                 this.sleep((long) sleepInterval);
 
-                File localFile = new File(fileDirectory + fileName);
+                localLog = new File(fileDirectory + fileName);
 
-                if (localFile.length() == 0)//If file is empty, go back to sleep and do not upload
+                if (localLog.length() == 0)//If file is empty, go back to sleep and do not upload
                     continue;
 
-                InputStream inputStream = new FileInputStream(localFile);
-                System.out.println("Uploading log-->     " + fileName);
-                boolean done = ftpClient.storeFile(fileName, inputStream);//variable to see if file was successfully transferred
+                newLogFileName = newFileName();
+                String newLogPath = fileDirectory + newLogFileName;
+                File rotatedFile = new File(newLogPath);
+                if(localLog.renameTo(rotatedFile)){
+                    System.out.println("File was successfully renamed");
+                }
+                InputStream inputStream = new FileInputStream(rotatedFile);
+                System.out.println("[Uploading Log]:     " + newLogFileName);
+                boolean done = ftpClient.storeFile(newLogFileName, inputStream);//variable to see if file was successfully transferred
                 inputStream.close();
                 if (done) {
-                    System.out.println(fileName + " was uploaded successfully");
-                    localFile.delete();
+                    System.out.println(newLogFileName + " was uploaded successfully");
+                    localLog.delete();//Delete old log
+                    rotatedFile.delete();//Deleted newly created rotated log
                 } else {
                     System.out.println(ftpClient.getReplyCode());
                 }
@@ -90,6 +105,14 @@ public class FtpClientLogger extends Thread {
                 System.out.println("Shutting down thread");
             }
         }
+    }
+    /**
+     * Logic to provide facility to change old filename to the same file but with date/time appended to the name.
+     */
+    public String newFileName(){
+        int indexOfLogExtension = fileName.indexOf(".log");
+        String fileWithDate = fileName.substring(0, indexOfLogExtension) + dateFormatter.format(new Date()) + fileName.substring(indexOfLogExtension);
+        return fileWithDate;
     }
 }
 
