@@ -3,7 +3,6 @@ package runningApp;
 import logger.Log;
 import logger.Logger;
 
-import java.util.ArrayList;
 
 public class RunningApplication {
     public static void main(String args[]){
@@ -12,7 +11,6 @@ public class RunningApplication {
         /*FtpClientLogger ftpLogger = new FtpClientLogger("localhost", 30, "low3llg3org3",
                 "Pikmin123","C:\\Users\\M4600_SSD\\IdeaProjects\\rotatinglogger\\src\\test\\local_logs\\","logger1.log");*/
         Log logger1 = logger.getLogger("logger1");
-        ArrayList<Thread> threads = new ArrayList<Thread>();
 
 
 
@@ -21,12 +19,10 @@ public class RunningApplication {
             thread.start();
         }*/
 
-        logger1.info("test info message");
-        logger1.error("test error message");
-        logger1.debug("test debug message");
+//        logger1.info("test info message");
+//        logger1.error("test error message");
+//        logger1.debug("test debug message");
 
-        //write other code to keep application
-        //running so other api can be used
     }
     static class MultithreadingDemo extends Thread
     {

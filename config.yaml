@@ -1,7 +1,7 @@
 #Logger Config file.  Each --- represents a new instance of Log to be created
 ---
 name: "logger1"
-interval: 5 # minutes
+interval: .2 # minutes
 host: "localhost"
 port: 22
 username: "low3llg3org3"

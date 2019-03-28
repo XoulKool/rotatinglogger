@@ -18,7 +18,7 @@ public class Log {
     String logFileDirectory;
     String logFileName;
     String level;
-    int interval;
+    float interval;
 
     BufferedWriter writer;//This is a shared resource between all logging threads for this Log.  All threads of this Log
                           //will use this Bufffered Writer to conserve memory
@@ -34,7 +34,8 @@ public class Log {
      */
     public void fireUpLog() {
         System.out.println(this.username);
-        FtpClientLogger ftpClientLogger = new FtpClientLogger(this.host, this.port, this.username, this.password, this.logFileDirectory, this.logFileName);
+        FtpClientLogger ftpClientLogger = new FtpClientLogger(this.host, this.port, this.username, this.password, this.logFileDirectory, this.logFileName, this.interval);
+        ftpClientLogger.start();
     }
 
     /**
@@ -140,11 +141,11 @@ public class Log {
         this.level = level;
     }
 
-    public int getInterval() {
+    public float getInterval() {
         return interval;
     }
 
-    public void setInterval(int interval) {
+    public void setInterval(float interval) {
         this.interval = interval;
     }
 

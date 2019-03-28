@@ -40,7 +40,7 @@ public class Logger {
         for(int i = 0; i < numberOfLoggers; i++){
             Log newLog = loggersList.get(i);
             loggerMap.put(newLog.name, newLog);
-            //loggersList.get(i).fireUpLog();
+            loggersList.get(i).fireUpLog();
         }
     }
 
