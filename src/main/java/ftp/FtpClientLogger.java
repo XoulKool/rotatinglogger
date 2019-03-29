@@ -25,7 +25,6 @@ public class FtpClientLogger extends Thread {
     String newLogPath;
     String newLogFileName;
     File localLog;
-    File rotatingLog;
     ReentrantLock fileLock;
 
     final int MINUTE_MULTIPLIER = 60000;

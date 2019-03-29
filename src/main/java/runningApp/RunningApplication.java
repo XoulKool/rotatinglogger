@@ -3,11 +3,6 @@ package runningApp;
 import logger.Log;
 import logger.Logger;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
 public class RunningApplication {
     public static void main(String args[]) {
         Logger logger = new Logger();
