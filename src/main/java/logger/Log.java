@@ -21,10 +21,13 @@ public class Log {
     String logFileName;
     String level;
     float interval;
+
+    //This lock will be passed to FtpClientLogger instance and will be shared with the associated Log.
+    //The lock will prevent any IO issues between the Log class' writeLog() and FtpClientLogger's uploadFile()
     ReentrantLock fileLock = new ReentrantLock();
 
     BufferedWriter writer;//This is a shared resource between all logging threads for this Log.  All threads of this Log
-                          //will use this Bufffered Writer to conserve memory
+    //will use this Bufffered Writer to conserve memory
 
     final boolean APPEND = true;//variable to be used in file writer.
     final String ERROR = "ERROR";
@@ -33,7 +36,8 @@ public class Log {
 
     /**
      * This method will fire up the connection to the ftp server, and will consequently start the wait for an upload
-     * to the server.
+     * to the server.  A Reentrant lock is passed through to the FtpClientLogger to prevent race condition between File IO
+     * between writeLog() and uploadLog()
      */
     public void fireUpFTPService() {
         FtpClientLogger ftpClientLogger = new FtpClientLogger(this.host, this.port, this.username, this.password, this.logFileDirectory, this.logFileName, this.interval, this.fileLock);
@@ -48,18 +52,18 @@ public class Log {
 
         String logToBeWritten = "[" + logType + "]-----|" + log + "|-----";
         fileLock.lock();
-        try{
-        File file = new File(this.logFileDirectory + this.logFileName);
-        try {
-            file.createNewFile();//Creates new file if and only if a file with this name does not exist
-            writer = new BufferedWriter(new FileWriter(file, APPEND));
-            writer.append(logToBeWritten + "\n");
-            writer.close();
-        } catch (IOException e) {
-            System.out.println("There was an IO error logging to");
-            e.printStackTrace();
-        }}
-        finally {
+        try {//try for lock.  This lock is shared with this log's instance of FtpClientLogger to prevent race condition
+            File file = new File(this.logFileDirectory + this.logFileName);
+            try {//try for IO Excpetion
+                file.createNewFile();//Creates new file if and only if a file with this name does not exist
+                writer = new BufferedWriter(new FileWriter(file, APPEND));
+                writer.append(logToBeWritten + "\n");
+                writer.close();
+            } catch (IOException e) {
+                System.out.println("There was an IO error logging to");
+                e.printStackTrace();
+            }
+        } finally {
             fileLock.unlock();
         }
     }
@@ -67,14 +71,14 @@ public class Log {
     /**
      * Provide logging facility to write info logs.  Only Log classes with level INFO or DEBUG can write these logs.
      * If has proper log-level permissions, returns 1.  Otherwise it returns 0.
+     *
      * @param infoLog
      */
-    public int info(String infoLog){
-        if(!level.equals(ERROR)){//If the level is anything but error, then allow this log to write to file
+    public int info(String infoLog) {
+        if (!level.equals(ERROR)) {//If the level is anything but error, then allow this log to write to file
             writeLog(INFO, infoLog);
             return 1;
-        }
-        else{
+        } else {
             System.out.println(name + " has insufficient log level to write " + INFO + " logs.");
             return 0;
         }
@@ -82,22 +86,23 @@ public class Log {
 
     /**
      * Provide logging facility to write error logs.  All levels are able to write these types of logs.
+     *
      * @param errorLog
      */
-    public void error(String errorLog){
+    public void error(String errorLog) {
         writeLog(ERROR, errorLog);
     }
 
     /**
      * Provide logging facility to write debug logs.  Only Log classes with level DEBUG can write these logs.
+     *
      * @param debugLog
      */
-    public int debug(String debugLog){
-        if(level.equals(DEBUG)){//Only the debug level has the ability to write debug logs
+    public int debug(String debugLog) {
+        if (level.equals(DEBUG)) {//Only the debug level has the ability to write debug logs
             writeLog(DEBUG, debugLog);
             return 1;
-        }
-        else{
+        } else {
             System.out.println(name + " has insufficient log level to write " + DEBUG + " logs.");
             return 0;
         }

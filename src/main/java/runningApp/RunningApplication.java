@@ -13,7 +13,7 @@ public class RunningApplication {
         Logger logger = new Logger();
         logger.init("config.yaml");
 
-
+        //Run a crazy amount of loggers to put the pedal to the medal.
         for(int i = 0; i < 10; i++){
         LoggerThread loggerThread = new LoggerThread();
         LoggerThread2 loggerThread2 = new LoggerThread2();

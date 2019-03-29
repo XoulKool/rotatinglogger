@@ -113,9 +113,8 @@ public class FtpClientLogger extends Thread {
         newLogFileName = timeStampFile(fileName, date);
         String newLogPath = fileDirectory + newLogFileName;
         File rotatedFile = new File(newLogPath);
-        fileLock.lock();
-        InputStream inputStream; {
-        }
+        InputStream inputStream;
+        fileLock.lock();//lock next critical section.  Only one method, either writeLog or uploadFile, can access the original file at once
         try {
             if (!localLog.renameTo(rotatedFile)) {
                 System.out.println("rename failed for log " + newLogFileName);
@@ -130,8 +129,14 @@ public class FtpClientLogger extends Thread {
         inputStream.close();
         if (done) {
             System.out.println(newLogFileName + " was uploaded successfully");
-            //localLog.delete();
-            rotatedFile.delete();//Deleted newly created rotated log
+            fileLock.lock();//Another critical section.  There will be file IO issues if a log is writing while uploadLog attempts to delete old log.
+            try {
+                localLog.delete();
+                rotatedFile.delete();
+            }//Deleted newly created rotated log, as well as old log
+            finally{
+                fileLock.unlock();
+            }
             return 1;
         } else {
             System.out.println("There was an error uploading log " + newLogFileName);
