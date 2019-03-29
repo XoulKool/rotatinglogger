@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class is used by Log class to generate its own usable instance of Apache's FTP client
@@ -25,6 +26,7 @@ public class FtpClientLogger extends Thread {
     String newLogFileName;
     File localLog;
     File rotatingLog;
+    ReentrantLock fileLock;
 
     final int MINUTE_MULTIPLIER = 60000;
 
@@ -45,7 +47,7 @@ public class FtpClientLogger extends Thread {
      * @param fileName
      * @param intervalInMinutes
      */
-    public FtpClientLogger(String host, int port, String username, String password, String fileDirectory, String fileName, float intervalInMinutes) {
+    public FtpClientLogger(String host, int port, String username, String password, String fileDirectory, String fileName, float intervalInMinutes, ReentrantLock fileLock) {
 
         ftpClient = new FTPClient();
         this.fileDirectory = fileDirectory;
@@ -53,6 +55,7 @@ public class FtpClientLogger extends Thread {
         this.sleepInterval = intervalInMinutes * MINUTE_MULTIPLIER;
         this.dateFormatter = new SimpleDateFormat("_yyyyMMdd_HHmmss");
         this.newLogPath = "";
+        this.fileLock = fileLock;
 
         try {
             ftpClient.connect(host, port);
@@ -110,13 +113,24 @@ public class FtpClientLogger extends Thread {
         newLogFileName = timeStampFile(fileName, date);
         String newLogPath = fileDirectory + newLogFileName;
         File rotatedFile = new File(newLogPath);
-        localLog.renameTo(rotatedFile);
-        InputStream inputStream = new FileInputStream(rotatedFile);
+        fileLock.lock();
+        InputStream inputStream; {
+        }
+        try {
+            if (!localLog.renameTo(rotatedFile)) {
+                System.out.println("rename failed for log " + newLogFileName);
+            }
+            inputStream = new FileInputStream(rotatedFile);
+        }
+        finally {
+            fileLock.unlock();
+        }
         System.out.println("[Uploading Log]:     " + newLogFileName);
         boolean done = ftpClient.storeFile(newLogFileName, inputStream);//variable to see if file was successfully transferred
         inputStream.close();
         if (done) {
             System.out.println(newLogFileName + " was uploaded successfully");
+            //localLog.delete();
             rotatedFile.delete();//Deleted newly created rotated log
             return 1;
         } else {

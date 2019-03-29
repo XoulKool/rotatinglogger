@@ -11,7 +11,7 @@ logFileName: "logger1.log"
 level: "DEBUG"
 ---
 name: "logger2"
-interval: 3
+interval: .3
 host: "localhost"
 port: 23
 username: "goldengod"

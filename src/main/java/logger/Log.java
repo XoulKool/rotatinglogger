@@ -3,6 +3,7 @@ package logger;
 import ftp.FtpClientLogger;
 
 import java.io.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class carries out most of the logging facilities for an individual logger.  The snakeyaml parser is also able to utilize this class
@@ -10,6 +11,7 @@ import java.io.*;
  * are necessary for snakeyaml to do this, as they help instantiate the java bean)
  */
 public class Log {
+
     String name;
     String host;
     int port;
@@ -19,6 +21,7 @@ public class Log {
     String logFileName;
     String level;
     float interval;
+    ReentrantLock fileLock = new ReentrantLock();
 
     BufferedWriter writer;//This is a shared resource between all logging threads for this Log.  All threads of this Log
                           //will use this Bufffered Writer to conserve memory
@@ -33,7 +36,7 @@ public class Log {
      * to the server.
      */
     public void fireUpFTPService() {
-        FtpClientLogger ftpClientLogger = new FtpClientLogger(this.host, this.port, this.username, this.password, this.logFileDirectory, this.logFileName, this.interval);
+        FtpClientLogger ftpClientLogger = new FtpClientLogger(this.host, this.port, this.username, this.password, this.logFileDirectory, this.logFileName, this.interval, this.fileLock);
         ftpClientLogger.start();
     }
 
@@ -41,9 +44,11 @@ public class Log {
      * This function will be used by error, info, and debug logging functions to write to the log file associated with
      * this instance of Log.  The method is synchronized so that only one thread can write to this log at a time.
      */
-    public synchronized void writeLog(String logType, String log) {
+    public void writeLog(String logType, String log) {
 
-        String logToBeWritten = "[" + logType + "]       " + log;
+        String logToBeWritten = "[" + logType + "]-----|" + log + "|-----";
+        fileLock.lock();
+        try{
         File file = new File(this.logFileDirectory + this.logFileName);
         try {
             file.createNewFile();//Creates new file if and only if a file with this name does not exist
@@ -53,6 +58,9 @@ public class Log {
         } catch (IOException e) {
             System.out.println("There was an IO error logging to");
             e.printStackTrace();
+        }}
+        finally {
+            fileLock.unlock();
         }
     }
 

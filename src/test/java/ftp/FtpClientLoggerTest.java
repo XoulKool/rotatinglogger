@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static org.junit.Assert.*;
 
@@ -27,7 +28,8 @@ public class FtpClientLoggerTest {
         String fileDirectory = "\\directory\\";
         String fileName = "file.log";
         float interval = (float) 0.2;
-        ftpClientLogger = new FtpClientLogger(host, port, username, password, fileDirectory, fileName,  interval);
+        ReentrantLock fileLock = new ReentrantLock();
+        ftpClientLogger = new FtpClientLogger(host, port, username, password, fileDirectory, fileName,  interval, fileLock);
     }
 
 
@@ -55,7 +57,8 @@ public class FtpClientLoggerTest {
         String fileDirectory = workingDir + "\\src\\test\\test_logs\\";
         String fileName = "empty.log";
         float interval = (float) 0.2;
-        ftpClientLogger = new FtpClientLogger(host, port, username, password, fileDirectory, fileName,  interval);
+        ReentrantLock fileLock = new ReentrantLock();
+        ftpClientLogger = new FtpClientLogger(host, port, username, password, fileDirectory, fileName,  interval, fileLock);
         int actualValue = -3;//0,-1,and -2 are all already taken
         try{
             actualValue = ftpClientLogger.uploadLog();
@@ -75,9 +78,10 @@ public class FtpClientLoggerTest {
         String fileDirectory = workingDir + "\\src\\test\\test_logs\\";
         String fileName = "actual.log";
         File file = new File(fileDirectory + fileName);
+        ReentrantLock fileLock = new ReentrantLock();
 
         float interval = (float) 0.2;
-        ftpClientLogger = new FtpClientLogger(host, port, username, password, fileDirectory, fileName,  interval);
+        ftpClientLogger = new FtpClientLogger(host, port, username, password, fileDirectory, fileName,  interval, fileLock);
         int actualValue = -3;//0,-1,and -2 are all already taken
         try{
             file.createNewFile();
@@ -101,9 +105,9 @@ public class FtpClientLoggerTest {
         String fileDirectory = workingDir + "\\src\\test\\test_logs\\";
         String fileName = "actual.log";
         File file = new File(fileDirectory + fileName);
-
         float interval = (float) 0.2;
-        ftpClientLogger = new FtpClientLogger(host, port, username, password, fileDirectory, fileName,  interval);
+        ReentrantLock fileLock = new ReentrantLock();
+        ftpClientLogger = new FtpClientLogger(host, port, username, password, fileDirectory, fileName,  interval, fileLock);
         int actualValue = -3;//0,-1,and -2 are all already taken
         try{
             file.createNewFile();

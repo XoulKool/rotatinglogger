@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Logger {
-    HashMap<String, Log> loggerMap = new HashMap();//This variable will be a mapping of the names of the loggers to the actual logging object
+    static HashMap<String, Log> loggerMap = new HashMap();//This variable will be a mapping of the names of the loggers to the actual logging object
     /**
      * Given the path of a config file, instantiate all logs and their associated FTPClients.
      * FTP clients should sleep until time interval indicated in config.
@@ -54,7 +54,7 @@ public class Logger {
      * @param loggerName
      * @return
      */
-    public Log getLogger(String loggerName){
+    public static Log getLogger(String loggerName){
         if(loggerMap.containsKey(loggerName)){
             return loggerMap.get(loggerName);
         }
