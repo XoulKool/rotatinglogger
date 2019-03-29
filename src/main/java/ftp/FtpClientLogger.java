@@ -72,7 +72,6 @@ public class FtpClientLogger extends Thread {
     public void run() {
         while (true) {//Run this thread indefinitely until it is interrupted
             try {
-                System.out.println("Go to Sleep...");
                 this.sleep((long) sleepInterval);
                 uploadLog();
             } catch (IOException e) {
@@ -118,9 +117,7 @@ public class FtpClientLogger extends Thread {
         inputStream.close();
         if (done) {
             System.out.println(newLogFileName + " was uploaded successfully");
-            if(rotatedFile.delete()){
-                System.out.println("Rotated file has been deleted!");
-            };//Deleted newly created rotated log
+            rotatedFile.delete();//Deleted newly created rotated log
             return 1;
         } else {
             System.out.println("There was an error uploading log " + newLogFileName);

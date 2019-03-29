@@ -19,7 +19,8 @@ public class Logger {
      * @param configPath
      */
     public void init(String configPath){
-        Yaml yaml = new Yaml(new Constructor(Log.class));
+        Yaml yaml = new Yaml(new Constructor(Log.class));//For every document in yaml file, this will generate one Log class.
+
         InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(configPath);
@@ -28,15 +29,18 @@ public class Logger {
             System.out.println("Unable to find yaml config.");
             System.exit(0);
         }
+
+        //The following is logic to move all loggers trapped in snakeyaml object into usable object.
         int numberOfLoggers = 0;
-        Iterable<Object> loggersIterable = yaml.loadAll(inputStream);
-        ArrayList<Log> loggersList = new ArrayList<Log>();
+        Iterable<Object> loggersIterable = yaml.loadAll(inputStream);//snakeyaml dump
+
+        ArrayList<Log> loggersList = new ArrayList<Log>();//ArrayList to dump
         while(loggersIterable.iterator().hasNext()){
             numberOfLoggers++;
             loggersList.add((Log) loggersIterable.iterator().next());
         }
         //This for loop will fire up all of the ftp clients for each of the loggers, as well as save the loggers in
-        //an easily traversable Map
+        //an easily traversable Map, which is used by get method.
         for(int i = 0; i < numberOfLoggers; i++){
             Log newLog = loggersList.get(i);
             loggerMap.put(newLog.name, newLog);
