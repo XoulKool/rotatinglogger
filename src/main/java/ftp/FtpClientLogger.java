@@ -29,7 +29,7 @@ public class FtpClientLogger extends Thread {
     final int MINUTE_MULTIPLIER = 60000;
 
     /**
-     * Once initialized, the Logger class  will call on the run method of this thread class to begin waiting for a
+     * Once initialized, the Logger class  will call on the run method of this thread-extended class to begin waiting for a
      * chance to upload the current log file to server specified in config via FTP (service provided by apache commons-net).
      * If the log file is empty, the thread will fall back asleep and wait for
      * the next chance.  If it is not empty, the thread will get the current date/time and update the name of the log

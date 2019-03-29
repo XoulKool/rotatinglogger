@@ -10,6 +10,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.junit.Assert.*;
+
+/**
+ * Junit tester for FtpClientLogger class
+ */
 public class FtpClientLoggerTest {
 
     FtpClientLogger ftpClientLogger;
@@ -43,7 +47,6 @@ public class FtpClientLoggerTest {
     @Test
     public void testEmptyLogUploadScenario(){//Be sure there is an empty log in directory provided
         String workingDir = System.getProperty("user.dir");//get current working directory
-        System.out.println(workingDir);
 
         String host = "localhost";
         int port = 22;
@@ -65,7 +68,6 @@ public class FtpClientLoggerTest {
     @Test
     public void testPositiveUploadScenario(){
         String workingDir = System.getProperty("user.dir");//get current working directory
-        System.out.println(workingDir);
         String host = "localhost";
         int port = 22;
         String username = "goldengod";
@@ -78,7 +80,6 @@ public class FtpClientLoggerTest {
         ftpClientLogger = new FtpClientLogger(host, port, username, password, fileDirectory, fileName,  interval);
         int actualValue = -3;//0,-1,and -2 are all already taken
         try{
-            System.out.println(file.getPath());
             file.createNewFile();
             FileWriter fw = new FileWriter(file);
             fw.write("This is an actual log");
@@ -93,7 +94,6 @@ public class FtpClientLoggerTest {
     @Test
     public void NegativeUploadScenario(){
         String workingDir = System.getProperty("user.dir");//get current working directory
-        System.out.println(workingDir);
         String host = "localhost";
         int port = 22;
         String username = "invalid";//if invalid user this test will always work.
@@ -106,7 +106,6 @@ public class FtpClientLoggerTest {
         ftpClientLogger = new FtpClientLogger(host, port, username, password, fileDirectory, fileName,  interval);
         int actualValue = -3;//0,-1,and -2 are all already taken
         try{
-            System.out.println(file.getPath());
             file.createNewFile();
             FileWriter fw = new FileWriter(file);
             fw.write("This is an actual log");

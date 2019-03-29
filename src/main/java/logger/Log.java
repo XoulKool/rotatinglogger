@@ -32,8 +32,7 @@ public class Log {
      * This method will fire up the connection to the ftp server, and will consequently start the wait for an upload
      * to the server.
      */
-    public void fireUpLog() {
-        System.out.println(this.username);
+    public void fireUpFTPService() {
         FtpClientLogger ftpClientLogger = new FtpClientLogger(this.host, this.port, this.username, this.password, this.logFileDirectory, this.logFileName, this.interval);
         ftpClientLogger.start();
     }
@@ -44,7 +43,7 @@ public class Log {
      */
     public synchronized void writeLog(String logType, String log) {
 
-        String logToBeWritten = logType + "---->     " + log;
+        String logToBeWritten = "[" + logType + "]       " + log;
         File file = new File(this.logFileDirectory + this.logFileName);
         try {
             file.createNewFile();//Creates new file if and only if a file with this name does not exist
@@ -59,14 +58,17 @@ public class Log {
 
     /**
      * Provide logging facility to write info logs.  Only Log classes with level INFO or DEBUG can write these logs.
+     * If has proper log-level permissions, returns 1.  Otherwise it returns 0.
      * @param infoLog
      */
-    public void info(String infoLog){
+    public int info(String infoLog){
         if(!level.equals(ERROR)){//If the level is anything but error, then allow this log to write to file
             writeLog(INFO, infoLog);
+            return 1;
         }
         else{
             System.out.println(name + " has insufficient log level to write " + INFO + " logs.");
+            return 0;
         }
     }
 
@@ -82,12 +84,14 @@ public class Log {
      * Provide logging facility to write debug logs.  Only Log classes with level DEBUG can write these logs.
      * @param debugLog
      */
-    public void debug(String debugLog){
+    public int debug(String debugLog){
         if(level.equals(DEBUG)){//Only the debug level has the ability to write debug logs
             writeLog(DEBUG, debugLog);
+            return 1;
         }
         else{
             System.out.println(name + " has insufficient log level to write " + DEBUG + " logs.");
+            return 0;
         }
     }
 
